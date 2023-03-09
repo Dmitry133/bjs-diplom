@@ -26,12 +26,21 @@ ApiConnector.current(response => {
 
 const ratesBoard = new RatesBoard();
 
+let count = 0;
 const exchangeRates = () => {
     ApiConnector.getStocks(response => {
         //console.log(response);
        if (response.success === true) {
            ratesBoard.clearTable();
            ratesBoard.fillTable(response.data);
+           
+           count++;
+           console.log(count);
+           return true;
+       // вот тут выкидывает ошибку но эта ошибка , но все работает ???
+       //    ошибка (A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received)
+       // без return true выкидывает ошибку
+       // нашел решение тут ====>   https://stackoverflow.com/questions/72494154/a-listener-indicated-an-asynchronous-response-by-returning-true-but-the-messag
        } ;
     });
 
