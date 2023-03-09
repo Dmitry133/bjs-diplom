@@ -36,11 +36,8 @@ const exchangeRates = () => {
            
            count++;
            console.log(count);
-           return true;
-       // вот тут выкидывает ошибку но эта ошибка , но все работает ???
+       // вот тут выкидывает ошибку спустя некоторое время , но все работает ???
        //    ошибка (A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received)
-       // без return true выкидывает ошибку
-       // нашел решение тут ====>   https://stackoverflow.com/questions/72494154/a-listener-indicated-an-asynchronous-response-by-returning-true-but-the-messag
        } ;
     });
 
