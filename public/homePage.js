@@ -22,31 +22,107 @@ ApiConnector.current(response => {
     };
 });
 
-//Exchange Rates (не работает корректно)
+//Exchange Rates
 
 const ratesBoard = new RatesBoard();
 
 let count = 0;
 const exchangeRates = () => {
     ApiConnector.getStocks(response => {
-        //console.log(response);
        if (response.success === true) {
            ratesBoard.clearTable();
            ratesBoard.fillTable(response.data);
-           
            count++;
-           console.log(count);
-       // вот тут выкидывает ошибку спустя некоторое время , но все работает ???
-       //    ошибка (A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received)
+           console.log("обновил " + count)
        } ;
     });
-
-    console.log("я обновился");
 };
 
-setInterval(exchangeRates(), 1000); // ???? понять почему не вызывает постоянно????
+exchangeRates();
+setInterval(() => exchangeRates(), 60000);
 
+// Операции с деньгами
 
+//Зачисление
 
+const moneyManager = new MoneyManager();
+
+moneyManager.addMoneyCallback = (data) => {
+    ApiConnector.addMoney(data,response => {
+        if (response.success === true) {
+            ProfileWidget.showProfile(response.data);
+            moneyManager.setMessage(true,"Деньги успешено зачислены!");
+        } else {
+            moneyManager.setMessage(false, response.error);
+        };
+    });
+};
+
+// Конвертирование
+
+moneyManager.conversionMoneyCallback = (data) => {
+    ApiConnector.convertMoney(data, response => {
+        if (response.success === true) {
+            ProfileWidget.showProfile(response.data);
+            moneyManager.setMessage(true,"Конвертирование прошло успешено!");
+        } else {
+            moneyManager.setMessage(false, response.error);
+        };
+    });
+};
+
+//Перевод
+
+moneyManager.sendMoneyCallback = (data) => {
+  ApiConnector.transferMoney(data, response => {
+     if (response.success === true) {
+         ProfileWidget.showProfile(response.data);
+         moneyManager.setMessage(true,"Перевод совершен успешно!");
+     } else {
+         moneyManager.setMessage(false, response.error);
+     };
+  });
+};
+
+//Работа с избранным
+
+const favoritesWidget = new FavoritesWidget();
+
+ApiConnector.getFavorites(response => {
+    if (response.success === true) {
+        favoritesWidget.clearTable();
+        favoritesWidget.fillTable(response.data);
+        moneyManager.updateUsersList(response.data);
+    };
+});
+
+// добавить
+
+favoritesWidget.addUserCallback = (data) => {
+    ApiConnector.addUserToFavorites(data, response => {
+        if (response.success === true) {
+            favoritesWidget.clearTable();
+            favoritesWidget.fillTable(response.data);
+            moneyManager.updateUsersList(response.data);
+            favoritesWidget.setMessage(true,"Новый пользователь добавлен в список!");
+        } else {
+            favoritesWidget.setMessage(false, response.error);
+        };
+    });
+};
+
+// удалить
+
+favoritesWidget.removeUserCallback = (data) => {
+    ApiConnector.removeUserFromFavorites(data, response => {
+        if (response.success === true) {
+            favoritesWidget.clearTable();
+            favoritesWidget.fillTable(response.data);
+            favoritesWidget.setMessage(true,"Пользователь удален из список!");
+        } else {
+            favoritesWidget.setMessage(false, response.error);
+        };
+    });
+};
 
 
